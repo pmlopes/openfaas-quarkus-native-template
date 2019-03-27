@@ -2,7 +2,19 @@
 
 The [Quarkus](https://quarkus.io) template uses maven as a build system.
 
-The template makes use of the OpenFaaS incubator project [of-watchdog](https://github.com/openfaas-incubator/of-watchdog).
+The template makes use of the OpenFAAS incubator project [of-watchdog](https://github.com/openfaas-incubator/of-watchdog).
+
+Quarkus is a Kubernetes Native Java stack tailored for GraalVM & OpenJDK HotSpot, crafted from the best of breed Java libraries and standards. The very nature of the project makes it a perfect fit for serverless too. This template is a barebores quarkus template you would generate from:
+
+```bash
+mvn io.quarkus:quarkus-maven-plugin:0.12.0:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=function \
+    -DclassName="org.acme.quickstart.GreetingResource" \
+    -Dpath="/"
+```
+
+Packaged as a template to quickly be deployed on OpenFAAS. This means that all the official features and extensions can be used out of the box in your functions too.
 
 ### Structure
 
@@ -22,6 +34,24 @@ public class GreetingResource {
 }
 ```
 
+This template is not different than a regular Qaurkus application, all features you could use with Quarkus can be used here too.
+
+To get started with Qaurkus, please read the official [Getting Started Guide](https://quarkus.io/get-started/).
+
+### Using extensions
+
+Quarkus has several [extensions](https://quarkus.io/extensions/) available. They can be used with this template using the standard mechanisms:
+
+```bash
+# See the available extensions
+$ mvn quarkus:list-extensions
+# Add a specific extension
+$ mvn quarkus:add-extension -Dextensions="groupId:artifactId"
+```
+
+To conclude, using Quarkus for serverless is exactly the same as using quarkus for regular applications. 
+
+
 ### Trying the template
 
 ```
@@ -34,7 +64,7 @@ $ faas new --lang quarkus-native <fn-name>
 When working in development mode, the java application is build as usual:
 
 ```
-mvn clean package
+mvn clean package quarkus:dev
 ```
 
 When going to OpenFAAS, the build is run inside a Docker container using the provided `Dockerfile`.
