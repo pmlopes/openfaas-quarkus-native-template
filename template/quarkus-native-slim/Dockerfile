@@ -1,5 +1,5 @@
 # Get a build environment
-FROM oracle/graalvm-ce:19.3.1-java11 as build-aot
+FROM oracle/graalvm-ce:20.3.0-java11 as build-aot
 RUN gu install native-image
 # Set working dir
 RUN mkdir /app
@@ -41,6 +41,9 @@ COPY --from=base "/lib64/libstdc++.so.6" \
 
 FROM base_minimal
 
+RUN mkdir /config
+
+COPY --from=build-aot /app/function/target/classes/*.properties /config/
 COPY --from=build-aot /app/function/target/*-runner /function
 COPY --from=watchdog /fwatchdog /fwatchdog
 

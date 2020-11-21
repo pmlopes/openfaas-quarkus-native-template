@@ -1,5 +1,5 @@
 # Get a build environment
-FROM oracle/graalvm-ce:19.3.1-java11 as build-aot
+FROM oracle/graalvm-ce:20.3.0-java11 as build-aot
 RUN gu install native-image
 # Set working dir
 RUN mkdir /app
@@ -25,17 +25,19 @@ RUN microdnf install shadow-utils
 RUN groupadd app && useradd app -g app -d /home/app && mkdir -p /home/app
 
 WORKDIR /home/app
-USER app
 
 FROM base
 
-COPY --from=build-aot /app/function/target/*-runner /usr/bin/function
-COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
+RUN mkdir -p /app/config
 
+USER app
 
+COPY --from=build-aot /app/function/target/classes/*.properties /app/config/
+COPY --from=build-aot /app/function/target/*-runner /app/function
+COPY --from=watchdog /fwatchdog /app/fwatchdog
 
 ENV cgi_headers="true"
-ENV fprocess="function"
+ENV fprocess="/app/function"
 ENV mode="http"
 ENV upstream_url="http://127.0.0.1:8000"
 
@@ -43,6 +45,7 @@ ENV exec_timeout="20s"
 ENV write_timeout="25s"
 ENV read_timeout="25s"
 
+
 HEALTHCHECK --interval=1s CMD [ -e /tmp/.lock ] || exit 1
 
-CMD ["fwatchdog"]
+CMD ["/app/fwatchdog"]
