@@ -10,6 +10,11 @@ ADD mvnw /app/
 ADD .mvn /app/.mvn/
 # extra config
 ENV GRAALVM_HOME=$JAVA_HOME
+
+# Cache maven dependency
+ADD function/pom.xml /app/function/pom.xml
+RUN ./mvnw -f /app/function/pom.xml dependency:resolve
+
 # build the function
 ADD function /app/function
 RUN ./mvnw -f /app/function/pom.xml package -Pnative
