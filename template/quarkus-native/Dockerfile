@@ -34,7 +34,7 @@ USER app
 
 COPY --from=build-aot /app/function/target/classes/*.properties /app/config/
 COPY --from=build-aot /app/function/target/*-runner /app/function
-COPY --from=watchdog /fwatchdog /app/fwatchdog
+COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 
 ENV cgi_headers="true"
 ENV fprocess="/app/function"
@@ -48,4 +48,4 @@ ENV read_timeout="25s"
 
 HEALTHCHECK --interval=1s CMD [ -e /tmp/.lock ] || exit 1
 
-CMD ["/app/fwatchdog"]
+CMD ["fwatchdog"]
