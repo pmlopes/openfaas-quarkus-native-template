@@ -22,10 +22,14 @@ FROM openfaas/of-watchdog:0.8.1 as watchdog
 FROM registry.access.redhat.com/ubi8/ubi-minimal as base
 
 RUN mkdir -p /newtmp && chmod -R 777 /newtmp
+RUN mkdir /configtmp
+
+COPY --from=build-aot /app/function/target/classes/*.properties /configtmp/
 
 FROM scratch as base_minimal
 
 COPY --from=base /newtmp /tmp
+COPY --from=base /configtmp /config
 
 # libraries for quarkus
 COPY --from=base "/lib64/libstdc++.so.6" \
@@ -41,11 +45,11 @@ COPY --from=base "/lib64/libstdc++.so.6" \
 
 FROM base_minimal
 
-RUN mkdir /config
-
 COPY --from=build-aot /app/function/target/classes/*.properties /config/
 COPY --from=build-aot /app/function/target/*-runner /function
 COPY --from=watchdog /fwatchdog /fwatchdog
+
+
 
 ENV cgi_headers="true"
 ENV fprocess="/function"
