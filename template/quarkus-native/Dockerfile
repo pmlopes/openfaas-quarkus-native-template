@@ -16,7 +16,7 @@ RUN ./mvnw -f /app/function/pom.xml package -Pnative
 
 
 # use the openfaas image to get the watchdog
-FROM openfaas/of-watchdog:0.7.6 as watchdog
+FROM openfaas/of-watchdog:0.8.1 as watchdog
 
 # Create new image
 FROM registry.access.redhat.com/ubi8/ubi-minimal as base
