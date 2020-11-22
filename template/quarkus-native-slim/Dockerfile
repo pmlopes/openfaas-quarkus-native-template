@@ -47,8 +47,6 @@ COPY --from=build-aot /app/function/target/classes/*.properties /config/
 COPY --from=build-aot /app/function/target/*-runner /function
 COPY --from=watchdog /fwatchdog /fwatchdog
 
-
-
 ENV cgi_headers="true"
 ENV fprocess="/function"
 ENV mode="http"

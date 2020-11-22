@@ -23,21 +23,19 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal as base
 
 RUN microdnf install shadow-utils
 RUN groupadd app && useradd app -g app -d /home/app && mkdir -p /home/app
+USER app
 
 WORKDIR /home/app
+RUN mkdir -p /home/app/config && chown
 
 FROM base
 
-RUN mkdir -p /app/config
-
-USER app
-
-COPY --from=build-aot /app/function/target/classes/*.properties /app/config/
-COPY --from=build-aot /app/function/target/*-runner /app/function
+COPY --from=build-aot /app/function/target/classes/*.properties /home/app/config
+COPY --from=build-aot /app/function/target/*-runner /home/app/function
 COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 
 ENV cgi_headers="true"
-ENV fprocess="/app/function"
+ENV fprocess="/home/app/function"
 ENV mode="http"
 ENV upstream_url="http://127.0.0.1:8000"
 
