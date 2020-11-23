@@ -34,7 +34,7 @@ FROM base
 
 COPY --from=build-aot /app/function/target/classes/*.properties /home/app/bin/config/
 COPY --from=build-aot /app/function/target/*-runner /home/app/bin/function
-COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
+COPY --from=watchdog /fwatchdog /home/app/bin/fwatchdog
 
 ENV cgi_headers="true"
 ENV fprocess="function"
