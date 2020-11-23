@@ -2,7 +2,7 @@
 FROM oracle/graalvm-ce:20.3.0-java11 as build-aot
 RUN gu install native-image
 # Set working dir
-RUN mkdir /app
+RUN mkdir /app && mkdir -p /tmp/tmpapp
 WORKDIR /app
 
 # Add maven wrapper
@@ -12,8 +12,8 @@ ADD .mvn /app/.mvn/
 ENV GRAALVM_HOME=$JAVA_HOME
 
 # Cache maven dependency
-ADD function/pom.xml /app/function/pom.xml
-RUN ./mvnw -f /app/function/pom.xml dependency:resolve
+ADD function/pom.xml /tmp/tmpapp/pom.xml
+RUN ./mvnw -f /tmp/tmpapp/pom.xml dependency:resolve
 
 # build the function
 ADD function /app/function
