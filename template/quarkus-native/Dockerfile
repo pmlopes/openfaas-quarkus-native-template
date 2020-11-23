@@ -25,19 +25,19 @@ FROM openfaas/of-watchdog:0.8.1 as watchdog
 FROM registry.access.redhat.com/ubi8/ubi-minimal as base
 
 RUN microdnf install shadow-utils
-RUN groupadd app && useradd app -g app -d /home/app && mkdir -p /home/app/config
+RUN groupadd app && useradd app -g app -d /home/app && mkdir -p /home/app/bin/config
 USER app
 
 WORKDIR /home/app
 
 FROM base
 
-COPY --from=build-aot /app/function/target/classes/*.properties /home/app/config/
-COPY --from=build-aot /app/function/target/*-runner /home/app/function
+COPY --from=build-aot /app/function/target/classes/*.properties /home/app/bin/config/
+COPY --from=build-aot /app/function/target/*-runner /home/app/bin/function
 COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 
 ENV cgi_headers="true"
-ENV fprocess="/home/app/function"
+ENV fprocess="function"
 ENV mode="http"
 ENV upstream_url="http://127.0.0.1:8000"
 
