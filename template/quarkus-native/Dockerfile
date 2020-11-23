@@ -25,11 +25,10 @@ FROM openfaas/of-watchdog:0.8.1 as watchdog
 FROM registry.access.redhat.com/ubi8/ubi-minimal as base
 
 RUN microdnf install shadow-utils
-RUN groupadd app && useradd app -g app -d /home/app && mkdir -p /home/app
+RUN groupadd app && useradd app -g app -d /home/app && mkdir -p /home/app/config
 USER app
 
 WORKDIR /home/app
-RUN mkdir -p /home/app/config && chown
 
 FROM base
 
