@@ -32,7 +32,7 @@ WORKDIR /home/app
 
 FROM base
 
-COPY --from=build-aot /app/function/target/classes/*.properties /home/app/config
+COPY --from=build-aot /app/function/target/classes/*.properties /home/app/config/
 COPY --from=build-aot /app/function/target/*-runner /home/app/function
 COPY --from=watchdog /fwatchdog /usr/bin/fwatchdog
 
