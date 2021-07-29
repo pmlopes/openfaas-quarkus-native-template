@@ -1,8 +1,8 @@
 # Get a build environment
-FROM oracle/graalvm-ce:19.3.1-java11 as build-aot
+FROM oracle/graalvm-ce:20.3.0-java11 as build-aot
 RUN gu install native-image
 # Set working dir
-RUN mkdir /app
+RUN mkdir /app && mkdir -p /tmp/tmpapp
 WORKDIR /app
 
 # Add maven wrapper
@@ -10,22 +10,31 @@ ADD mvnw /app/
 ADD .mvn /app/.mvn/
 # extra config
 ENV GRAALVM_HOME=$JAVA_HOME
+
+# Cache maven dependency
+ADD function/pom.xml /tmp/tmpapp/pom.xml
+RUN ./mvnw -f /tmp/tmpapp/pom.xml dependency:resolve
+
 # build the function
 ADD function /app/function
 RUN ./mvnw -f /app/function/pom.xml package -Pnative
 
 
 # use the openfaas image to get the watchdog
-FROM openfaas/of-watchdog:0.7.6 as watchdog
+FROM openfaas/of-watchdog:0.8.1 as watchdog
 
 # Create new image
 FROM registry.access.redhat.com/ubi8/ubi-minimal as base
 
 RUN mkdir -p /newtmp && chmod -R 777 /newtmp
+RUN mkdir /configtmp
+
+COPY --from=build-aot /app/function/target/classes/*.properties /configtmp/
 
 FROM scratch as base_minimal
 
 COPY --from=base /newtmp /tmp
+COPY --from=base /configtmp /config
 
 # libraries for quarkus
 COPY --from=base "/lib64/libstdc++.so.6" \
@@ -41,6 +50,7 @@ COPY --from=base "/lib64/libstdc++.so.6" \
 
 FROM base_minimal
 
+COPY --from=build-aot /app/function/target/classes/*.properties /config/
 COPY --from=build-aot /app/function/target/*-runner /function
 COPY --from=watchdog /fwatchdog /fwatchdog
 
